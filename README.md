@@ -192,6 +192,65 @@ exampleOptions.Add("Some Other Option");
 someDropdownUIElement.BindOptionsTo(exampleOptions);
 ```
 
+
+### Timer
+
+```csharp
+        Timer _timer = new Timer(); // use time scale
+        Timer _timer = new Timer(new UnscaledTimeScheduler()); // use unscale time scale
+        Timer _timer = new Timer(new TimeScheduler()); // use time scale
+
+
+        _timer.StartedAsObservable.Subscribe(_ => Debug.Log("Start"));
+        _timer.FinishedAsObservable.Subscribe(_ =>
+        {
+            Debug.Log("Complete!");
+            _timer.Stop();
+        });
+        _timer.StoppedTimeAsObservable.Subscribe(_ => Debug.Log("HAHA it is completed"));
+        _timer.PausedTimeAsObservable.Subscribe(_ => Debug.Log("pause"));
+        _timer.ResumedAsObservable.Subscribe(_ => Debug.Log("Resume"));
+        _timer.Start(100);
+        _timer.ElapsedTimeAsObservable.Subscribe(_ => Debug.Log($" Elaspsed :{_}"));
+        _timer.RemainTimeAsObservable.Subscribe(_ => Debug.Log($" Remain :{_}"));
+        _timer.RemainTimeAsObservable.Select(it => Mathf.CeilToInt(it)).DistinctUntilChanged().Subscribe(_ => Debug.Log($" Remain :{_}")).AddTo(this);
+
+        _timer.RemainTimeAsObservable.Subscribe(time => this.Render(time, _timer.CurrentFinishTime)).AddTo(this);
+        _timer.IsPlayingAsObservable.Subscribe(_ => Debug.LogWarning("IsPlayingAsObservable : " + _));
+
+
+        //pause
+        _timer.Pause();
+
+        //resume
+        _timer.Resume();
+
+        //get remain time
+        _timer.GetRemainTime();
+
+        //get elapsed time
+        _timer.GetElapsedTime();
+
+        //check playing
+        _timer.IsPlaying();
+
+        //increase 100 seconds
+        _timer.IncreaseTime(100);
+
+        //decrease 100 seconds
+        _timer.DecreaseTime(100);
+
+
+
+
+        private void Render(float time, float finishTime)
+        {
+            var ratio = finishTime > 0 ? time / finishTime : 1f;
+            Debug.Log($"ratio :{ratio}");
+        }
+
+```
+
 ## Dependencies
 
 - [![UniRx](https://img.shields.io/badge/UniRx-7.1.0+-brightgreen.svg?style=flat&cacheSeconds=2592000)](https://github.com/worldreaver/UniRx/tree/7.1.1)

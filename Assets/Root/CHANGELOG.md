@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/worldreaver/UniRxEx/compare/1.0.0...1.1.0) (2020-03-14)
+
+
+### Features
+
+* add schedule for timer ([62ebf16](https://github.com/worldreaver/UniRxEx/commit/62ebf16c2671e75a802fa07b61d01c90965a5ea0))
+
 # 1.0.0 (2020-03-08)
 
 

@@ -1,14 +1,4 @@
-﻿/*******************************************************
- * Copyright (C) 2019-2020 worldreaver
- * __________________
- * All Rights Reserved
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by yenmoc - phongsoyenmoc.diep@gmail.com
- 
- *******************************************************/
-
-using System;
+﻿using System;
 using UniRx;
 
 namespace Worldreaver.Timer
@@ -30,11 +20,21 @@ namespace Worldreaver.Timer
         private IObservable<float> OscillatorObservable { get; }
 
         private IDisposable Subscription { get; set; }
+        
+        //private static IScheduler DefaultScheduler { get; } = new TimeScheduler();
 
         /// <summary>
         /// Create TimeWatch by default frame update oscillator
+        /// => UnityEngine.Time.deltaTime replace for DefaultScheduler.Delta
         /// </summary>
         public TimeWatch() : this(Observable.EveryUpdate().Select(_ => UnityEngine.Time.deltaTime))
+        {
+        }
+        
+        /// <summary>
+        /// Create TimeWatch by default frame update oscillator
+        /// </summary>
+        public TimeWatch(IScheduler scheduler) : this(Observable.EveryUpdate().Select(_ => scheduler.Delta))
         {
         }
 
@@ -56,11 +56,8 @@ namespace Worldreaver.Timer
             }
 
             _isPlayingProperty.Value = true;
-            Subscription = OscillatorObservable
-                .StartWith(0)
-                .Where(_ => IsPlaying)
-                .Scan((sum, it) => sum + it)
-                .Subscribe(TimeProperty);
+            Subscription = OscillatorObservable.StartWith(0).Where(_ => IsPlaying).Scan((sum,
+                it) => sum + it).Subscribe(TimeProperty);
         }
 
         public void Stop()
@@ -78,5 +75,15 @@ namespace Worldreaver.Timer
         {
             _isPlayingProperty.Value = false;
         }
+    }
+
+    public class TimeScheduler : IScheduler
+    {
+        public float Delta => UnityEngine.Time.deltaTime;
+    }
+
+    public class UnscaledTimeScheduler : IScheduler
+    {
+        public float Delta => UnityEngine.Time.unscaledDeltaTime;
     }
 }

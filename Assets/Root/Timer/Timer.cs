@@ -37,18 +37,22 @@ namespace Worldreaver.Timer
 
         #endregion
 
-        public Timer()
+        public Timer() : this(new TimeWatch())
+        {
+        }
+
+        public Timer(IScheduler scheduler) : this(new TimeWatch(scheduler))
+        {
+        }
+
+        private Timer(ITimeWatch timeWatch)
         {
             CurrentFinishTime = 0f;
             _startedSubject = new Subject<Unit>();
             _stoppedTimeSubject = new Subject<float>();
             _pausedTimeSubject = new Subject<float>();
             _resumedSubject = new Subject<Unit>();
-            _timeWatch = new TimeWatch();
-        }
-
-        protected virtual void Initialize()
-        {
+            _timeWatch = timeWatch;
         }
 
         public void Start(float timeSeconds)
@@ -79,23 +83,17 @@ namespace Worldreaver.Timer
 
         private IObservable<Unit> GetFinishedAsObservable()
         {
-            return GetElapsedTimeAsObservable()
-                .Where(time => time >= CurrentFinishTime)
-                .AsUnitObservable()
-                .First();
+            return GetElapsedTimeAsObservable().Where(time => time >= CurrentFinishTime).AsUnitObservable().First();
         }
 
         private IObservable<float> GetRemainTimeAsObservable()
         {
-            return _timeWatch.TimeAsObservable
-                .Select(time => CurrentFinishTime - time)
-                .Select(time => time < 0 ? 0 : time);
+            return _timeWatch.TimeAsObservable.Select(time => CurrentFinishTime - time).Select(time => time < 0 ? 0 : time);
         }
 
         private IObservable<float> GetElapsedTimeAsObservable()
         {
-            return _timeWatch.TimeAsObservable
-                .Select(time => time > CurrentFinishTime ? CurrentFinishTime : time);
+            return _timeWatch.TimeAsObservable.Select(time => time > CurrentFinishTime ? CurrentFinishTime : time);
         }
 
         public float GetRemainTime()

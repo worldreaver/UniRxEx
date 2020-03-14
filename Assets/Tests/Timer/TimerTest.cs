@@ -8,6 +8,7 @@ public class TimerTest : MonoBehaviour
     public Button btnStart;
     public Button btnPause;
     public Button btnResume;
+    public Button btnStop;
     public Button btnGetCurrentRemainTime;
     public Button btnGetCurrentElapsedTime;
     public Button btnIsPlaying;
@@ -26,6 +27,7 @@ public class TimerTest : MonoBehaviour
         btnStart.onClick.AddListener(StartTime);
         btnPause.onClick.AddListener(Pause);
         btnResume.onClick.AddListener(Resume);
+        btnStop.onClick.AddListener(Stop);
         btnGetCurrentRemainTime.onClick.AddListener(GetCurrentRemainTime);
         btnGetCurrentElapsedTime.onClick.AddListener(GetCurrentElapsedTime);
         btnIsPlaying.onClick.AddListener(IsPlaying);
@@ -51,11 +53,12 @@ public class TimerTest : MonoBehaviour
         _timer.RemainTimeAsObservable.Subscribe(_ =>
         {
             txtTime.text = _ + "";
-            Debug.Log($" Remain :{_}");
+            //Debug.Log($" Remain :{_}");
         });
-        _timer.RemainTimeAsObservable.Select(it => Mathf.CeilToInt(it)).DistinctUntilChanged().Subscribe(_ => Debug.Log($" Remain :{_}")).AddTo(this);
+        
+        //_timer.RemainTimeAsObservable.Select(it => Mathf.CeilToInt(it)).DistinctUntilChanged().Subscribe(_ => Debug.Log($" Remain :{_}")).AddTo(this);
 
-        _timer.RemainTimeAsObservable.Subscribe(time => this.Render(time, _timer.CurrentFinishTime)).AddTo(this);
+        //_timer.RemainTimeAsObservable.Subscribe(time => this.Render(time, _timer.CurrentFinishTime)).AddTo(this);
         _timer.IsPlayingAsObservable.Subscribe(_ => Debug.LogWarning("IsPlayingAsObservable : " + _));
     }
 
@@ -70,6 +73,12 @@ public class TimerTest : MonoBehaviour
     public void Pause()
     {
         _timer.Pause();
+    }
+
+    public void Stop()
+    {
+        _timer.Stop();
+        _timer = null;
     }
 
     public void Resume()
